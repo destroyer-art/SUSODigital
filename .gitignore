@@ -1,0 +1,96 @@
+# PHP project specific
+/vendor/
+/node_modules/
+composer.lock
+composer.phar
+.env
+.env.backup
+.phpunit.result.cache
+
+# Configuration files with sensitive data
+/config/config.php
+
+# Upload directories
+/uploads/*
+!/uploads/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# Cached files
+*.cache
+*.log
+.php_cs.cache
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# Generated files
+/dist/
+/build/
+/coverage/
+
+# Local development files
+*.local.php
+local.php
+*.local.json
+
+# Debug files
+*.log
+debug.log
+error_log
+access_log
+
+# Test files
+/tests/coverage/
+.phpunit.cache/
+
+# Dependency directories
+/bower_components/
+
+# Application specific
+/storage/*.key
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/app/public/*
+!/storage/app/public/.gitkeep
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Certificate files
+*.pem
+*.cert
+*.key
+
+# Session files
+/sessions/
+*.sess
+
+# Cache directories
+/cache/
+/tmp/ 

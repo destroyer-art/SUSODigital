@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Analytics | Luxury Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/report.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Performance Analytics</h1>
+            <p class="subtitle">ELEVATE YOUR INSIGHTS</p>
+        </header>
+        
+        <div class="upload-container">
+            <form id="uploadForm" method="post" enctype="multipart/form-data">
+                <div class="upload-area" id="dropZone">
+                    <div class="upload-content">
+                        <div class="icon">📊</div>
+                        <p class="upload-text">Drag and drop your performance graphs here</p>
+                        <div class="or">or</div>
+                        <button type="button" class="select-files">Select Files</button>
+                    </div>
+                    <input type="file" id="fileInput" name="files[]" multiple accept="image/*" style="display: none;">
+                </div>
+
+                <div id="preview" class="preview-container"></div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">Generate Report</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const uploadForm = document.getElementById('uploadForm');
+            const preview = document.getElementById('preview');
+            let selectedFiles = new FormData();
+
+            // Handle file input change
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            // Highlight drop zone when dragging over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            // Handle dropped files
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            // Click to select files
+            document.querySelector('.select-files').addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight(e) {
+                dropZone.classList.add('highlight');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('highlight');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                handleFiles(files);
+            }
+
+            function handleFiles(files) {
+                const validFiles = [...files].filter(file => {
+                    // Check file type
+                    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Invalid file type. Please upload images only.');
+                        return false;
+                    }
+                    // Check file size (5MB limit)
+                    if (file.size > 5 * 1024 * 1024) {
+                        alert('File too large. Maximum size is 5MB.');
+                        return false;
+                    }
+                    return true;
+                });
+
+                validFiles.forEach(file => {
+                    // Add to FormData
+                    selectedFiles.append('files[]', file);
+                    
+                    // Create preview
+                    const reader = new FileReader();
+                    reader.readAsDataURL(file);
+                    reader.onloadend = function() {
+                        const previewItem = document.createElement('div');
+                        previewItem.className = 'preview-item';
+                        
+                        const img = document.createElement('img');
+                        img.src = reader.result;
+                        img.className = 'preview-image';
+                        
+                        const removeBtn = document.createElement('div');
+                        removeBtn.className = 'remove-file';
+                        removeBtn.innerHTML = '×';
+                        removeBtn.onclick = function() {
+                            selectedFiles.delete(file.name);
+                            previewItem.remove();
+                        };
+                        
+                        previewItem.appendChild(img);
+                        previewItem.appendChild(removeBtn);
+                        preview.appendChild(previewItem);
+                    };
+                });
+            }
+
+            // Handle form submission
+            uploadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if ([...selectedFiles.entries()].length === 0) {
+                    alert('Please select files to upload');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(uploadForm.action, {
+                        method: 'POST',
+                        body: selectedFiles
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Clear preview and selected files
+                        preview.innerHTML = '';
+                        selectedFiles = new FormData();
+                        alert('Files uploaded successfully!');
+                    } else {
+                        alert(result.message || 'Upload failed');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert('Upload failed. Please try again.');
+                }
+            });
+        });
+    </script>
+    <script src="assets/js/upload.js"></script>
+</body>
+</html>
